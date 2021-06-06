@@ -1,5 +1,7 @@
+
 from django.db import models
 from django.db.models.signals import post_save
+from django.utils import timezone
 
 
 class Statistic(models.Model):
@@ -10,7 +12,7 @@ class Statistic(models.Model):
     views = models.IntegerField(blank=True, null=True, default=1)
     clicks = models.IntegerField(blank=True, null=True, default=1)
     cost = models.DecimalField(max_digits=6, decimal_places=2, default=1, blank=True, null=True)
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(default=timezone.now(), null=True, blank=True)
 
     # db name apiaries
     class Meta:
@@ -35,6 +37,9 @@ def statistics_data_updater(sender, instance, created, *args, **kwargs):
             instance.save()
         if instance.cost is None:
             instance.cost = 1
+            instance.save()
+        if instance.date is None:
+            instance.date = timezone.now()
             instance.save()
 
 
