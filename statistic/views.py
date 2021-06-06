@@ -22,6 +22,10 @@ class SaveStatisticsView(CreateAPIView):
 
 
 class ShowStatisticsView(APIView):
+    """
+    get :: show to user format that he need to enter date for creating queries
+    post :: grub data, make query , add calculation , return asked formatting
+    """
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
@@ -34,7 +38,6 @@ class ShowStatisticsView(APIView):
         """
         start_date = request.data.get('start_date')
         end_date = request.data.get('start_date')
-
         js_data = data_query_for_time(start_date, end_date)
 
         # response to user
@@ -44,5 +47,15 @@ class ShowStatisticsView(APIView):
             return Response({"msg": "no data"}, status=404)
 
 
-def reset_statistics():
-    pass
+class RemoveAllStatisticsView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        msg = 'do you like to remove all statistics data ? please enter in format {"answer": "yes"}'
+        return Response({"msg": msg})
+
+    def post(self, request):
+        answer: str = request.data.get("answer")
+        if answer.lower() == "yes":
+            Statistic.objects.all().delete()
+            return Response({"msg": "all statistics data was removed"}, status=200)
