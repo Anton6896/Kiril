@@ -18,7 +18,7 @@ class CreateStatisticsView(APIView):
               'views: positive int, ' \
               'clicks: positive int,' \
               'cost: positive decimal,' \
-              'date: yyyy-mm-dd }'
+              'date: yyyy-mm-dd } date must be provided '
         return Response({"msg": msg})
 
     def post(self, request):
@@ -55,7 +55,8 @@ class ShowStatisticsView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
-        msg = 'please enter data in format {start_date:date,end_date:date, order:optional } date format is yyyy-mm-dd'
+        msg = 'please enter data in format {start_date:date,end_date:date, order:optional }' \
+              ' date format is yyyy-mm-dd'
         return Response({"msg": msg})
 
     def post(self, request):

@@ -61,6 +61,8 @@ def entry_data_is_valid(date, views, clicks, cost):
         return True
     if cost and Decimal(cost) < 0:
         return True
+    if date is None:
+        return True
 
     # check date
     if date:

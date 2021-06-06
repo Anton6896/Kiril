@@ -21,8 +21,8 @@ class SeeStatsByDate(APITestCase):
 
     def test_stats(self):
         data = {
-            "start_date": "2021-6-1",
-            "end_date": "2021-6-10",
+            "start_date": "2021-6-3",
+            "end_date": "2021-6-5",
             "order": "clicks"
         }
         url = reverse('statistic:list')
