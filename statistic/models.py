@@ -12,7 +12,7 @@ class Statistic(models.Model):
     views = models.IntegerField(blank=True, null=True, default=1)
     clicks = models.IntegerField(blank=True, null=True, default=1)
     cost = models.DecimalField(max_digits=6, decimal_places=2, default=1, blank=True, null=True)
-    date = models.DateTimeField(default=timezone.now(), null=True, blank=True)
+    date = models.DateTimeField()
 
     # db name apiaries
     class Meta:
