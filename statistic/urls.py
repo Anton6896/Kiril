@@ -1,11 +1,12 @@
 from django.urls import path
-from .views import SaveStatisticsView, ShowStatisticsView, RemoveAllStatisticsView
+from .views import ShowStatisticsView, RemoveAllStatisticsView, CreateStatisticsView
 
 app_name = 'statistic'
 
 urlpatterns = [
-    path('api/create_new', SaveStatisticsView.as_view(), name='save'),
-    path('api/show_statistics_all', ShowStatisticsView.as_view(), name='list'),
+
+    path('api/create_new', CreateStatisticsView.as_view(), name='create'),
+    path('api/show_by_date', ShowStatisticsView.as_view(), name='list'),
     path('api/remove_all', RemoveAllStatisticsView.as_view(), name='remove'),
 
 ]

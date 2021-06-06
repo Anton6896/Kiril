@@ -1,24 +1,48 @@
-from django.shortcuts import render
-from rest_framework.renderers import JSONRenderer
-
-from rest_framework.generics import (
-    CreateAPIView
-)
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
-from .serializers import CreateStatisticSerializer
 from .models import Statistic
+from .utils import data_query_for_time, entry_data_is_valid
 
-from .utils import data_query_for_time
 
-
-class SaveStatisticsView(CreateAPIView):
+class CreateStatisticsView(APIView):
     """
-    create statistics entry
+    Creating entry of Statistic obj if data ok
+    else have validators that check appropriate values (all data mast be in positive range)
     """
-    queryset = Statistic.objects.all()
-    serializer_class = CreateStatisticSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        # show explanation to user
+        msg = 'please enter data in format { ' \
+              'views: positive int, ' \
+              'clicks: positive int,' \
+              'cost: positive decimal,' \
+              'date: yyyy-mm-dd }'
+        return Response({"msg": msg})
+
+    def post(self, request):
+        date = request.data.get('date')
+        views = request.data.get('views')
+        clicks = request.data.get('clicks')
+        cost = request.data.get('cost')
+
+        # use custom validator to check positive values
+        if entry_data_is_valid(date, views, clicks, cost):
+            return Response({"msg": "your data is invalid"}, status=400)
+
+        else:
+            # if object created return status 200 with message
+            _, created = Statistic.objects.get_or_create(
+                views=views,
+                clicks=clicks,
+                cost=cost,
+                date=date
+            )
+            if created:
+                return Response({"msg": "entry created"}, status=200)
+            else:
+                return Response({"msg": "some server error please tell to admin "}, status=400)
 
 
 class ShowStatisticsView(APIView):
@@ -59,3 +83,5 @@ class RemoveAllStatisticsView(APIView):
         if answer.lower() == "yes":
             Statistic.objects.all().delete()
             return Response({"msg": "all statistics data was removed"}, status=200)
+        else:
+            return Response({"msg": "please try again , sys can't understand ypu"}, status=302)

@@ -1,3 +1,4 @@
+import re
 from .models import Statistic
 from django.db.models import Q
 from django.core import serializers
@@ -35,3 +36,26 @@ def data_query_for_time(start, end):
         })
 
     return my_qs
+
+
+def entry_data_is_valid(date, views, clicks, cost):
+    # check positive value
+    if views and views < 0:
+        return True
+    if clicks and clicks < 0:
+        return True
+    if cost and cost < 0:
+        return True
+
+    # check date
+    year, month, day = date.split('-')
+    if int(year) < 2010 or 12 < int(month) < 1 or 31 < int(day) < 1:
+        return True
+
+    # cost cents accuracy (in dolor can't be more than 99 cents)
+    if cost:
+        cents = int(str(cost).split('.')[1])
+        if cents > 99:
+            return True
+
+    return False
