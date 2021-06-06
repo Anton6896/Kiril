@@ -2,15 +2,16 @@ from decimal import *
 from .models import Statistic
 from django.core import serializers
 import datetime
+from django.utils.dateparse import parse_date
 
 
 def _order_util(start, end, order):
     """
-    return qs in order
+    return qs in order if user asked
     """
+    start_date = parse_date(start)
+    end_date = parse_date(end)
 
-    start_date = datetime.datetime.strptime(start, "%Y-%m-%d").date()
-    end_date = datetime.datetime.strptime(end, "%Y-%m-%d").date()
 
     if order:
         qs_actual = Statistic.objects.filter(
@@ -56,6 +57,9 @@ def data_query_for_time(start, end, order):
 
 
 def entry_data_is_valid(date, views, clicks, cost):
+    """
+    function to check user data at creation of stat obj
+    """
     # check positive value
     if views and int(views) < 0:
         return True
