@@ -28,3 +28,12 @@ class SeeStatsByDate(APITestCase):
         url = reverse('statistic:list')
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
+
+
+class DeleteAllEntryes(APITestCase):
+
+    def test_delete_all(self):
+        data = {"answer": "yes"}
+        url = reverse('statistic:remove')
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
