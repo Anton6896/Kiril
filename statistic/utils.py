@@ -1,3 +1,5 @@
+
+from decimal import *
 from .models import Statistic
 from django.core import serializers
 
@@ -53,11 +55,11 @@ def data_query_for_time(start, end, order):
 
 def entry_data_is_valid(date, views, clicks, cost):
     # check positive value
-    if views and views < 0:
+    if views and int(views) < 0:
         return True
-    if clicks and clicks < 0:
+    if clicks and int(clicks) < 0:
         return True
-    if cost and cost < 0:
+    if cost and Decimal(cost) < 0:
         return True
 
     # check date
