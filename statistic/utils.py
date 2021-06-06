@@ -1,19 +1,26 @@
-
 from decimal import *
 from .models import Statistic
 from django.core import serializers
+import datetime
 
 
-def _order_util(order, start, end):
+def _order_util(start, end, order):
     """
     return qs in order
     """
+
+    start_date = datetime.datetime.strptime(start, "%Y-%m-%d").date()
+    end_date = datetime.datetime.strptime(end, "%Y-%m-%d").date()
+
     if order:
         qs_actual = Statistic.objects.filter(
-            date__range=[start, end]
+            date__gte=start_date, date__lte=end_date
         ).order_by(str(order))
-
-        return qs_actual
+    else:
+        qs_actual = Statistic.objects.filter(
+            date__gte=start_date, date__lte=end_date
+        )
+    return qs_actual
 
 
 def data_query_for_time(start, end, order):
@@ -25,12 +32,7 @@ def data_query_for_time(start, end, order):
     user can get ordered qs
     """
 
-    if order:
-        qs_actual = _order_util(order, start, end)
-    else:
-        qs_actual = Statistic.objects.filter(
-            date__range=[start, end]
-        )
+    qs_actual = _order_util(start, end, order)
 
     # serializing query
     ser_qs = serializers.serialize('python', qs_actual)
