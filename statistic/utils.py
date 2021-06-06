@@ -1,21 +1,27 @@
 from decimal import *
 from .models import Statistic
 from django.core import serializers
+from django.utils.dateparse import parse_date
 import datetime
 
 
 def _order_util(start, end, order):
     """
-    return qs in order
+    return qs in order if user asked
+    !!! because of my not understanding or bug (i opened at repo)
+    i to (+ datetime.timedelta(days=1)) to end date
+    Django didnt return date_lte !!!!
     """
-
-    start_date = datetime.datetime.strptime(start, "%Y-%m-%d").date()
-    end_date = datetime.datetime.strptime(end, "%Y-%m-%d").date()
+    start_date = parse_date(start)
+    end_date = parse_date(end) + datetime.timedelta(days=1)
 
     if order:
         qs_actual = Statistic.objects.filter(
+            # date__gte=start_date, date__lte=end_date
             date__gte=start_date, date__lte=end_date
         ).order_by(str(order))
+
+        print(qs_actual.query)
     else:
         qs_actual = Statistic.objects.filter(
             date__gte=start_date, date__lte=end_date
@@ -56,6 +62,9 @@ def data_query_for_time(start, end, order):
 
 
 def entry_data_is_valid(date, views, clicks, cost):
+    """
+    function to check user data at creation of stat obj
+    """
     # check positive value
     if views and int(views) < 0:
         return True
