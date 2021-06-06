@@ -24,8 +24,6 @@ urlpatterns = [
     # urls for api part
     path('', include('statistic.urls')),
     path('api-auth/', include('rest_framework.urls')),
-    path('api/', include('djoser.urls')),
-    path('api/', include('djoser.urls.authtoken')),
 ]
 
 # on debug mode append media and static files locations
