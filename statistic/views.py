@@ -41,7 +41,7 @@ class CreateStatisticsView(APIView):
                 date=date
             )
             if created:
-                return Response({"msg": "entry created"}, status=200)
+                return Response({"msg": "entry created"}, status=201)
             else:
                 return Response({"msg": "some server error please tell to admin "}, status=400)
 
