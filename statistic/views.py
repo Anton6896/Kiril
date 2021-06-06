@@ -32,6 +32,7 @@ class CreateStatisticsView(APIView):
             return Response({"msg": "your data is invalid"}, status=400)
 
         else:
+
             # if object created return status 200 with message
             _, created = Statistic.objects.get_or_create(
                 views=views,
@@ -49,11 +50,12 @@ class ShowStatisticsView(APIView):
     """
     get :: show to user format that he need to enter date for creating queries
     post :: grub data, make query , add calculation , return asked formatting
+    on post user can specify order to show
     """
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
-        msg = 'please enter data in format {start_date:date,end_date:date } date format is yyyy-mm-dd'
+        msg = 'please enter data in format {start_date:date,end_date:date, order:optional } date format is yyyy-mm-dd'
         return Response({"msg": msg})
 
     def post(self, request):
@@ -61,8 +63,9 @@ class ShowStatisticsView(APIView):
         get from user range of time for creating appropriate query
         """
         start_date = request.data.get('start_date')
-        end_date = request.data.get('start_date')
-        js_data = data_query_for_time(start_date, end_date)
+        end_date = request.data.get('end_date')
+        order = request.data.get('order')
+        js_data = data_query_for_time(start_date, end_date, order)
 
         # response to user
         if js_data:

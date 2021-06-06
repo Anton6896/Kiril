@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.signals import post_save
 
 
 class Statistic(models.Model):
@@ -17,3 +18,24 @@ class Statistic(models.Model):
 
     def __str__(self):
         return str(self.pk)
+
+
+def statistics_data_updater(sender, instance, created, *args, **kwargs):
+    """
+    in case if statistics object created without data
+    change None fields to 1 for calculations
+    """
+    # create Profile for ech user (Singleton)
+    if created:
+        if instance.views is None:
+            instance.views = 1
+            instance.save()
+        if instance.clicks is None:
+            instance.clicks = 1
+            instance.save()
+        if instance.cost is None:
+            instance.cost = 1
+            instance.save()
+
+
+post_save.connect(statistics_data_updater, sender=Statistic)
