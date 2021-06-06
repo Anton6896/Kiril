@@ -1,6 +1,9 @@
 # Kiril - Stat service
 
+[GitHub](https://github.com/Anton6896/Kiril)
+
 * Create service by `api/create_new` data must be positive in format
+
 ```
 {
     "views":1,
@@ -24,12 +27,20 @@ return : {"msg": "entry created"}, status=200. or appropriate error message {"ms
 }
 ```
 
-have additional feature is ordering by one of the values (views,clicks,cost,date) 
+have additional feature is ordering by one of the values (views,clicks,cost,date)
 
-* user can delete all data from table by `api/remove_all` 
+* user can delete all data from table by `api/remove_all`
+
 ```
 {
     "answer":"yes"
 }
 ```
+
 if answer yes data will be deleted
+
+i am showed how to connect in settings.py to postgres todo is :
+
+1. install [psycopg2](https://pypi.org/project/psycopg2/)
+2. crete settings separator folder with 2 settings (one for local one for product)
+3. in new `settings/__init__.py` check the system working place for adjust appropriate settings file data [example](https://github.com/Anton6896/django-one-1/tree/main/root/settings)
