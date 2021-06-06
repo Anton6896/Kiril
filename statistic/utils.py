@@ -1,6 +1,4 @@
-import re
 from .models import Statistic
-from django.db.models import Q
 from django.core import serializers
 
 
@@ -10,7 +8,7 @@ def _order_util(order, start, end):
     """
     if order:
         qs_actual = Statistic.objects.filter(
-            Q(date__gte=start) | Q(date__lte=end)
+            date__range=[start, end]
         ).order_by(str(order))
 
         return qs_actual
@@ -29,14 +27,11 @@ def data_query_for_time(start, end, order):
         qs_actual = _order_util(order, start, end)
     else:
         qs_actual = Statistic.objects.filter(
-            Q(date__gte=start) | Q(date__lte=end)
+            date__range=[start, end]
         )
-
-    print(Statistic.objects.filter(date__gte=start))
 
     # serializing query
     ser_qs = serializers.serialize('python', qs_actual)
-    print(ser_qs)
 
     # generating appropriate format + additional calculation addons
     my_qs = []
