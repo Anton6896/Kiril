@@ -75,6 +75,10 @@ class ShowStatisticsView(APIView):
 
 
 class RemoveAllStatisticsView(APIView):
+    """
+    Removes all saved statistics.
+    user must post {"answer": "yes"}
+    """
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):

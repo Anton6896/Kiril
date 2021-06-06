@@ -22,7 +22,6 @@ def data_query_for_time(start, end, order):
     for additional data :
     cpc = cost / clicks (average click price)
     cpm = cost / views * 1000 (average cost 1000 views)
-
     user can get ordered qs
     """
 
