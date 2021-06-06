@@ -39,6 +39,7 @@ INSTALLED_APPS = [
 
     # my addons
     'statistic',
+    'rest_framework',
     'rest_framework.authtoken',
     'djoser',  # user auth
     'corsheaders'  # security middlewear
@@ -134,7 +135,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # api framework config
 REST_FRAMEWORK = {
 
-    'DATETIME_FORMAT': "%Y-%m-%d %H:%M",
+    'DATETIME_FORMAT': "%Y-%m-%d",
 
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 
@@ -143,5 +144,9 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
 
     ],
+
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
 
 }
