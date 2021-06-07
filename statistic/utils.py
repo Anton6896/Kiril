@@ -5,6 +5,21 @@ from django.utils.dateparse import parse_date
 import datetime
 
 
+def add_to_date(views, clicks, cost, obj):
+    """
+    if object exists update field of interest
+    """
+    if views:
+        obj.views = (obj.views + views)
+        obj.save()
+    if clicks:
+        obj.clicks = (obj.clicks + clicks)
+        obj.save()
+    if cost:
+        obj.cost = (obj.cost + Decimal(cost))
+        obj.save()
+
+
 def _order_util(start, end, order):
     """
     return qs in order if user asked
@@ -21,7 +36,7 @@ def _order_util(start, end, order):
             date__gte=start_date, date__lte=end_date
         ).order_by(str(order))
 
-        print(qs_actual.query)
+        # print(qs_actual.query)
     else:
         qs_actual = Statistic.objects.filter(
             date__gte=start_date, date__lte=end_date
