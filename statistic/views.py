@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
 from .models import Statistic
-from .utils import data_query_for_time, entry_data_is_valid
+from .utils import data_query_for_time, entry_data_is_valid, add_to_date
 
 
 class CreateStatisticsView(APIView):
@@ -33,6 +33,13 @@ class CreateStatisticsView(APIView):
 
         else:
 
+            # if object exists aggregate data else create object
+            s_obj = Statistic.objects.filter(date=date)
+            if s_obj.exists():
+                obj = s_obj.first()
+                add_to_date(views, clicks, cost, obj)
+                return Response({"msg": "entry updated"}, status=200)
+
             # if object created return status 200 with message
             _, created = Statistic.objects.get_or_create(
                 views=views,
@@ -40,6 +47,7 @@ class CreateStatisticsView(APIView):
                 cost=cost,
                 date=date
             )
+
             if created:
                 return Response({"msg": "entry created"}, status=201)
             else:
