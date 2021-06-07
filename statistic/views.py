@@ -19,7 +19,7 @@ class CreateStatisticsView(APIView):
               'clicks: positive int,' \
               'cost: positive decimal,' \
               'date: yyyy-mm-dd } date must be provided '
-        return Response({"msg": msg})
+        return Response({"msg": msg}, status=200)
 
     def post(self, request):
         date = request.data.get('date')
@@ -43,7 +43,7 @@ class CreateStatisticsView(APIView):
             if created:
                 return Response({"msg": "entry created"}, status=201)
             else:
-                return Response({"msg": "some server error please tell to admin "}, status=400)
+                return Response({"msg": "some server error please tell to admin "}, status=500)
 
 
 class ShowStatisticsView(APIView):
@@ -92,4 +92,4 @@ class RemoveAllStatisticsView(APIView):
             Statistic.objects.all().delete()
             return Response({"msg": "all statistics data was removed"}, status=200)
         else:
-            return Response({"msg": "please try again , sys can't understand ypu"}, status=302)
+            return Response({"msg": "please try again , sys can't understand ypu"}, status=400)
