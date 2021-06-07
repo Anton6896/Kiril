@@ -2,7 +2,7 @@
 
 [GitHub](https://github.com/Anton6896/Kiril)
 
-* Create service by `api/create_new` data must be positive in format
+* Create service by `api/create_new` data must be positive in format (if obj found by date , will be agregated)
 
 ```
 {
