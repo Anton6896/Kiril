@@ -20,6 +20,9 @@ def _order_util(start, end, order):
             tot_view=Sum('views'),
             tot_clicks=Sum('clicks'),
             tot_cost=Sum('cost')
+        ).annotate(
+            cpc=F('tot_cost') / F('clicks'),
+            cpm=(F('tot_cost') / F('tot_view') * 1000)
         ).order_by(str(order))
 
     else:
