@@ -22,7 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # urls for api part
-    path('', include('statistic.urls')),
+    path('api/', include('statistic.urls')),
     path('api-auth/', include('rest_framework.urls')),
 ]
 

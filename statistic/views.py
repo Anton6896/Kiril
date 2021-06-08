@@ -1,57 +1,27 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import permissions
+from rest_framework import permissions, status
 from .models import Statistic
-from .utils import data_query_for_time, entry_data_is_valid, add_to_date
+from .utils import data_query_for_time
+from rest_framework.generics import CreateAPIView
+from .serializers import CreateStatisticsSerializer
+from django.db import connection
 
 
 class CreateStatisticsView(APIView):
-    """
-    Creating entry of Statistic obj if data ok
-    else have validators that check appropriate values (all data mast be in positive range)
-    """
     permission_classes = [permissions.AllowAny]
 
-    def get(self, request):
-        # show explanation to user
-        msg = 'please enter data in format { ' \
-              'views: positive int, ' \
-              'clicks: positive int,' \
-              'cost: positive decimal,' \
-              'date: yyyy-mm-dd } date must be provided '
-        return Response({"msg": msg}, status=200)
-
     def post(self, request):
-        date = request.data.get('date')
-        views = request.data.get('views')
-        clicks = request.data.get('clicks')
-        cost = request.data.get('cost')
-
-        # use custom validator to check positive values
-        if entry_data_is_valid(date, views, clicks, cost):
-            return Response({"msg": "your data is invalid"}, status=400)
-
-        else:
-
-            # if object exists aggregate data else create object
-            s_obj = Statistic.objects.filter(date=date)
-            if s_obj.exists():
-                obj = s_obj.first()
-                add_to_date(views, clicks, cost, obj)
-                return Response({"msg": "entry updated"}, status=200)
-
-            # if object created return status 200 with message
-            _, created = Statistic.objects.get_or_create(
-                views=views,
-                clicks=clicks,
-                cost=cost,
-                date=date
+        serializer = CreateStatisticsSerializer(data=request.data)
+        if serializer.is_valid():
+            Statistic.objects.create(
+                views=request.data.get('views'),
+                clicks=request.data.get('clicks'),
+                cost=request.data.get('cost'),
+                date=request.data.get('date')
             )
-
-            if created:
-                return Response({"msg": "entry created"}, status=201)
-            else:
-                return Response({"msg": "some server error please tell to admin "}, status=500)
+            return Response({"msg": "created"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ShowStatisticsView(APIView):
@@ -97,7 +67,11 @@ class RemoveAllStatisticsView(APIView):
     def post(self, request):
         answer: str = request.data.get("answer")
         if answer.lower() == "yes":
-            Statistic.objects.all().delete()
+            # Statistic.objects.truncate()
+            cursor = connection.cursor()
+            # for sqlite using DELETE FROM
+            cursor.execute("DELETE FROM `statistic`")
+
             return Response({"msg": "all statistics data was removed"}, status=200)
         else:
             return Response({"msg": "please try again , sys can't understand ypu"}, status=400)

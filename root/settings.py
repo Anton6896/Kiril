@@ -160,6 +160,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
 
     'DATETIME_FORMAT': "%Y-%m-%d",
+    # 'DATETIME_INPUT_FORMATS': "%Y-%m-%d",
 
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 

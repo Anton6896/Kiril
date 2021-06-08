@@ -1,47 +1,40 @@
 from decimal import *
+from django.db.models import Sum, FloatField
 from .models import Statistic
-from django.core import serializers
 from django.utils.dateparse import parse_date
 import datetime
-
-
-def add_to_date(views, clicks, cost, obj):
-    """
-    if object exists update field of interest
-    """
-    if views:
-        obj.views = (obj.views + views)
-        obj.save()
-    if clicks:
-        obj.clicks = (obj.clicks + clicks)
-        obj.save()
-    if cost:
-        obj.cost = (obj.cost + Decimal(cost))
-        obj.save()
+from django.db.models import F
 
 
 def _order_util(start, end, order):
     """
-    return qs in order if user asked
-    !!! because of my not understanding or bug (i opened at repo)
-    i to (+ datetime.timedelta(days=1)) to end date
-    Django didnt return date_lte !!!!
+    group_by answer with sum and additional calculations in db
     """
     start_date = parse_date(start)
     end_date = parse_date(end) + datetime.timedelta(days=1)
 
     if order:
-        qs_actual = Statistic.objects.filter(
-            # date__gte=start_date, date__lte=end_date
+        qs = Statistic.objects.filter(
             date__gte=start_date, date__lte=end_date
+        ).values('date').annotate(
+            tot_view=Sum('views'),
+            tot_clicks=Sum('clicks'),
+            tot_cost=Sum('cost')
         ).order_by(str(order))
 
-        # print(qs_actual.query)
     else:
-        qs_actual = Statistic.objects.filter(
+        qs = Statistic.objects.filter(
             date__gte=start_date, date__lte=end_date
+        ).values('date').annotate(
+            tot_view=Sum('views'),
+            tot_clicks=Sum('clicks'),
+            tot_cost=Sum('cost')
+        ).annotate(
+            cpc=F('tot_cost') / F('clicks'),
+            cpm=(F('tot_cost') / F('tot_view') * 1000)
         )
-    return qs_actual
+
+    return qs
 
 
 def data_query_for_time(start, end, order):
@@ -52,33 +45,24 @@ def data_query_for_time(start, end, order):
     cpm = cost / views * 1000 (average cost 1000 views)
     user can get ordered qs
     """
+    qs = _order_util(start, end, order)
 
-    qs_actual = _order_util(start, end, order)
-
-    # serializing query
-    ser_qs = serializers.serialize('python', qs_actual)
-
-    # generating appropriate format + additional calculation addons
     my_qs = []
-    for i in ser_qs:
-        cpc = i['fields']['cost'] / i['fields']['clicks']
-        cpm = i['fields']['cost'] / i['fields']['views'] * 1000
-
+    for obj in qs:
         my_qs.append({
-            "date": i['fields']['date'],
-            "views": i['fields']['views'],
-            "clicks": i['fields']['clicks'],
-            "cost": i['fields']['cost'],
-            "cpc": cpc,
-            "cpm": cpm
+            "date": obj['date'],
+            "total_view": obj['tot_view'],
+            "tot_clicks": obj['tot_clicks'],
+            "tot_cost": obj['tot_cost'],
+            "cpc": obj['cpc'],
+            "cpm": obj['cpm'],
         })
-
     return my_qs
 
 
 def entry_data_is_valid(date, views, clicks, cost):
     """
-    function to check user data at creation of stat obj
+    additional data validation
     """
     # check positive value
     if views and int(views) < 0:

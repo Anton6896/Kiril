@@ -1,4 +1,3 @@
-
 from django.db import models
 from django.db.models.signals import post_save
 from django.utils import timezone
@@ -9,23 +8,23 @@ class Statistic(models.Model):
     class represents Statistics
     for better calculating reasons added default values as 1 to all not text fields
     """
-    views = models.IntegerField(blank=True, null=True, default=1)
-    clicks = models.IntegerField(blank=True, null=True, default=1)
-    cost = models.DecimalField(max_digits=6, decimal_places=2, default=1, blank=True, null=True)
+    views = models.IntegerField(blank=True, null=True)
+    clicks = models.IntegerField(blank=True, null=True)
+    cost = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     date = models.DateTimeField()
 
     # db name apiaries
     class Meta:
         db_table = 'statistic'
+        indexes = [models.Index(fields=['date'])]
 
     def __str__(self):
-        return str(self.pk)
+        return f"stat: {str(self.pk)}, date:{self.date}"
 
 
 def statistics_data_updater(sender, instance, created, *args, **kwargs):
     """
-    in case if statistics object created without data
-    change None fields to 1 for calculations
+    additional check ig data is None change in db
     """
     # create Profile for ech user (Singleton)
     if created:
